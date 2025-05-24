@@ -36,6 +36,8 @@ services:
       - FULLTEXTSEARCH_JAVA_OPTIONS="-Xms1024M -Xmx1024M"
       - BORG_RETENTION_POLICY=--keep-within=7d --keep-weekly=4 --keep-monthly=6
     ports:
+      - 3478:3478/TCP
+      - 3478:3478/UDP
       - 172.17.0.1:59056:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
