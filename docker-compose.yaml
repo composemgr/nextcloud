@@ -37,8 +37,8 @@ services:
       - 172.17.0.1:59056:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/srv/$USER/docker/nextcloud/all-in-one/latest/rootfs/data/nextcloud:/mnt/data/nextcloud
-      - /var/lib/srv/$USER/docker/nextcloud/all-in-one/latest/rootfs/config/nextcloud:/mnt/docker-aio-config
+      - /var/lib/srv/$USER/docker/nextcloud/rootfs/data/nextcloud:/mnt/data/nextcloud
+      - /var/lib/srv/$USER/docker/nextcloud/rootfs/config/nextcloud:/mnt/docker-aio-config
     networks:
       - nextcloud
 
