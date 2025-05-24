@@ -41,10 +41,15 @@ services:
       - 172.17.0.1:59056:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
       - /var/lib/srv/$USER/docker/nextcloud/rootfs/data/nextcloud:/mnt/data/nextcloud
       - /var/lib/srv/$USER/docker/nextcloud/rootfs/config/nextcloud:/mnt/docker-aio-config
     networks:
       - nextcloud
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer # This line is not allowed to be changed as otherwise the built-in backup solution will not work
 
 networks:
   nextcloud:
