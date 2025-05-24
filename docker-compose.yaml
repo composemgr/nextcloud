@@ -11,7 +11,7 @@ services:
   app:
     image: nextcloud/all-in-one:latest
     container_name: nextcloud-app
-    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    hostname: ${BASE_DOMAIN_NAME:-$HOSTNAME}
     restart: always
     pull_policy: always
     init: true
