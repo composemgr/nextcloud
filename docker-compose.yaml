@@ -1,0 +1,34 @@
+# nginx proxy address - https://172.17.0.1:59056
+
+name: nextcloud
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: lscr.io/linuxserver/nextcloud:latest
+    container_name: nextcloud-app
+    domainname: ${BASE_DOMAIN_NAME:-}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      - 'TZ=${TZ:-America/New_York}'
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - 172.17.0.1:59056:443
+    volumes:
+      - ./rootfs/data:/data
+      - ./rootfs/config:/config
+    networks:
+      - nextcloud
+
+networks:
+  nextcloud:
+    name: nextcloud
+    external: false
