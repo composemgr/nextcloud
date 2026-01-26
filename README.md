@@ -21,7 +21,7 @@ Nextcloud is a fully-featured self-hosted productivity platform providing file s
 
 ### Using curl
 ```shell
-curl -q -LSsf "https://raw.githubusercontent.com/composemgr/nextcloud/main/docker-compose.yaml" | docker compose -f - up -d
+curl -q -LSsf "https://raw.githubusercontent.com/composemgr/nextcloud/main/docker-compose.yaml" -o compose.yml
 ```
 
 ### Using git
