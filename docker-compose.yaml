@@ -23,8 +23,8 @@ services:
     ports:
       - 172.17.0.1:59056:443
     volumes:
-      - './rootfs/data/nextcloud:/data'
-      - './rootfs/config/nextcloud:/config'
+      - './volumes/data/nextcloud:/data'
+      - './volumes/config/nextcloud:/config'
     networks:
       - nextcloud
 
