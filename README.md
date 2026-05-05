@@ -78,9 +78,9 @@ MAIL_DOMAIN=${BASE_DOMAIN_NAME}
 
 ## �� Volumes
 
-- `./rootfs/data/nextcloud` - Nextcloud files and data
-- `./rootfs/config/nextcloud` - Configuration files
-- `./rootfs/db/mariadb/nextcloud` - Database files
+- `./volumes/data/nextcloud` - Nextcloud files and data
+- `./volumes/config/nextcloud` - Configuration files
+- `./volumes/db/mariadb/nextcloud` - Database files
 
 ## 🔐 Security
 
