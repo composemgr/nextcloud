@@ -1,4 +1,4 @@
-# nginx proxy address - https://172.17.0.1:59056
+# nginx proxy address - http://172.17.0.1:59056
 
 name: nextcloud
 x-logging: &default-logging
