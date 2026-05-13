@@ -11,17 +11,17 @@ services:
   app:
     image: lscr.io/linuxserver/nextcloud:latest
     container_name: nextcloud-app
-    domainname: ${BASE_DOMAIN_NAME:-}
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
     pull_policy: always
     logging: *default-logging
     environment:
-      - 'TZ=${TZ:-America/New_York}'
+      TZ: ${TZ:-America/New_York}
       PUID: ${SERVICE_USER:-1000}
       PGID: ${SERVICE_GROUP:-1000}
     ports:
-      - 172.17.0.1:59056:443
+      - '172.17.0.1:59056:443'
     volumes:
       - './volumes/data/nextcloud:/data'
       - './volumes/config/nextcloud:/config'
