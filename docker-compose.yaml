@@ -18,6 +18,8 @@ services:
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: nextcloud-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
       PUID: ${SERVICE_USER:-1000}
       PGID: ${SERVICE_GROUP:-1000}
     ports:
@@ -27,8 +29,30 @@ services:
       - './volumes/config/nextcloud:/config'
     networks:
       - nextcloud
+      - proxy
+      - cloudflare
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://nextcloud-app:443'
+      - 'cloudflare.hostname=nextcloud.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.nextcloud-app.entrypoints=http'
+      - 'traefik.http.routers.nextcloud-app-secure.tls=true'
+      - 'traefik.http.routers.nextcloud-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.nextcloud-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.nextcloud-app.middlewares=nextcloud-app-https-redirect'
+      - 'traefik.http.routers.nextcloud-app-secure.entrypoints=https'
+      - 'traefik.http.routers.nextcloud-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.nextcloud-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.nextcloud-app-secure.service=nextcloud-app'
+      - 'traefik.http.services.nextcloud-app.loadbalancer.server.port=443'
 
 networks:
   nextcloud:
     name: nextcloud
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
