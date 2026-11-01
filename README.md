@@ -4,35 +4,29 @@ Nextcloud - Self-hosted productivity platform (files, calendar, contacts, and mo
 
 ## 📋 Description
 
-Nextcloud is a fully-featured self-hosted productivity platform providing file sync, calendar, contacts, mail, office documents, video calls, and hundreds of apps. The premier open-source alternative to Google Workspace and Microsoft 365.
+Nextcloud is a fully-featured self-hosted productivity platform providing file sync, calendar, contacts, mail, office documents, video calls, and hundreds of apps. The premier open-source alternative to Google Workspace and Microsoft 365. This stack runs the LinuxServer Nextcloud image alone; point it at an external database from the Nextcloud admin settings after first start.
 
 ## 🚀 Services
 
-- **app**: Nextcloud server with PHP-FPM
-- **db**: MariaDB/PostgreSQL database
-- **redis**: Cache for performance
-
-### Infrastructure Components
-
-- **Database**: MariaDB or PostgreSQL
-- **Cache**: Redis for session/file locking
+- **app**: lscr.io/linuxserver/nextcloud:latest
 
 ## 📦 Installation
 
-### Using curl
-```shell
+### Option 1: Quick Install
+```bash
 curl -q -LSsf "https://raw.githubusercontent.com/composemgr/nextcloud/main/docker-compose.yaml" -o compose.yml
 ```
 
-### Using git
-```shell
+### Option 2: Git Clone
+```bash
 git clone "https://github.com/composemgr/nextcloud" ~/.local/srv/docker/nextcloud
 cd ~/.local/srv/docker/nextcloud
-docker compose up -d
+cp default.env .env
+docker compose --env-file .env up -d
 ```
 
-### Using composemgr
-```shell
+### Option 3: Using composemgr
+```bash
 composemgr install nextcloud
 ```
 
@@ -41,77 +35,95 @@ composemgr install nextcloud
 ### Environment Variables
 
 ```shell
-# Core Settings
 TZ=America/New_York
-BASE_HOST_NAME=${HOSTNAME}
-BASE_DOMAIN_NAME=
+APP_ORG_NAME=Nextcloud
+SERVICE_USER=1000
+SERVICE_GROUP=1000
+```
 
-# Database
-DB_USER_NAME=nextcloud
-DB_USER_PASS=changeme_db_password
-DB_CREATE_DATABASE_NAME=nextcloud
+See `docker-compose.yaml` for complete list of configurable options.
 
-# Nextcloud Config
-NEXTCLOUD_ADMIN_USER=admin
-NEXTCLOUD_ADMIN_PASSWORD=changeme_admin_password
-NEXTCLOUD_TRUSTED_DOMAINS=${BASE_HOST_NAME}
-TRUSTED_PROXIES=172.17.0.0/16
+### Environment Files
 
-# Redis
-REDIS_HOST=nextcloud-redis
-REDIS_HOST_PORT=6379
+`default.env.sample` holds the full set of variables and is copied to `.env`
+before starting the stack:
 
-# Email (optional)
-SMTP_HOST=172.17.0.1
-SMTP_PORT=587
-SMTP_NAME=${EMAIL_SERVER_USER}
-SMTP_PASSWORD=${EMAIL_SERVER_PASS}
-MAIL_FROM_ADDRESS=nextcloud
-MAIL_DOMAIN=${BASE_DOMAIN_NAME}
+```bash
+cp default.env .env
+docker compose --env-file .env up -d
+```
+
+`app.env.sample` holds the app-specific overrides and is copied to `app.env`:
+
+```bash
+cp app.env.sample app.env
+```
+
+`composemgr up` applies `app.env` and `default.env` automatically. Raw
+`docker compose` commands need `--env-file .env` to pick up the same values.
+
+### Reverse Proxy
+
+Three standalone compose files ship in this repo:
+
+| File | Use |
+|------|-----|
+| `docker-compose.yaml` | Default, published on `172.17.0.1:64269` |
+| `docker-compose.traefik.yaml` | Behind an existing external `traefik` network |
+| `docker-compose.tunnel.yaml` | Behind an existing external `cloudflare` tunnel network |
+
+```bash
+docker compose -f docker-compose.traefik.yaml --env-file .env up -d
 ```
 
 ## 🌐 Access
 
-- **Web Interface**: http://172.17.0.1:[port]
-- **Default Admin**: admin / changeme_admin_password
-- **WebDAV**: https://your-domain.com/remote.php/dav
+- **Web Interface**: http://172.17.0.1:64269
+- **WebDAV**: `/remote.php/dav`
 
-## �� Volumes
+Complete the web setup wizard on first visit to create the admin account.
+
+## 📂 Volumes
 
 - `./volumes/data/nextcloud` - Nextcloud files and data
 - `./volumes/config/nextcloud` - Configuration files
-- `./volumes/db/mariadb/nextcloud` - Database files
 
 ## 🔐 Security
 
-- Change admin password immediately
+- Change the admin password immediately after first start
 - Enable 2FA for all users
-- Use HTTPS (reverse proxy required)
-- Configure trusted domains
-- Regular security scans via admin panel
+- Use HTTPS (reverse proxy required for production)
+- Set the trusted domain to your `BASE_HOST_NAME` in Nextcloud admin settings
+- Regular security scans via the admin panel
 - Keep Nextcloud and apps updated
 
 ## 🔍 Logging
 
 ```shell
-docker compose logs -f app
-docker compose logs -f db
+docker compose --env-file .env logs -f app
 ```
 
 ## 🛠️ Management
 
-```shell
-# Start
-docker compose up -d
+```bash
+# Start services
+docker compose --env-file .env up -d
+
+# Stop services
+docker compose --env-file .env down
+
+# Update to latest images
+docker compose --env-file .env pull && docker compose --env-file .env up -d
+
+# View logs
+docker compose --env-file .env logs -f
+
+# Restart services
+docker compose --env-file .env restart
 
 # Run occ commands
-docker compose exec -u www-data app php occ status
-docker compose exec -u www-data app php occ maintenance:mode --on
-docker compose exec -u www-data app php occ db:add-missing-indices
-
-# Update
-docker compose pull && docker compose up -d
-docker compose exec -u www-data app php occ upgrade
+docker compose --env-file .env exec -u www-data app php occ status
+docker compose --env-file .env exec -u www-data app php occ maintenance:mode --on
 ```
 
 ## 📋 Requirements

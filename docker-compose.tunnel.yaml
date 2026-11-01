@@ -1,0 +1,39 @@
+name: nextcloud
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: lscr.io/linuxserver/nextcloud:latest
+    container_name: nextcloud-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: nextcloud-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+      PUID: ${SERVICE_USER:-1000}
+      PGID: ${SERVICE_GROUP:-1000}
+    volumes:
+      - './volumes/data/nextcloud:/data:z'
+      - './volumes/config/nextcloud:/config:z'
+    labels:
+      - 'cloudflare.enable=true'
+      - 'cloudflare.service=http://nextcloud-app:80'
+      - 'cloudflare.hostname=${BASE_HOST_NAME:-$HOSTNAME}'
+    networks:
+      - nextcloud
+      - cloudflare
+
+networks:
+  nextcloud:
+    name: nextcloud
+    external: false
+  cloudflare:
+    external: true
